@@ -1,0 +1,190 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %} · DMS</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230d8a76'/%3E%3Cpath d='M32 48s-14-8.6-14-19a8 8 0 0 1 14-5.3A8 8 0 0 1 46 29c0 10.4-14 19-14 19z' fill='white'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    {% with url_name=request.resolver_match.url_name path=request.path %}
+    <!-- Sidebar -->
+    <aside class="app-sidebar" id="appSidebar">
+        <a href="{% url 'dashboard:index' %}" class="app-brand">
+            <span class="brand-mark"><i class="fas fa-heart"></i></span>
+            <span>DMS<small>Donation Management</small></span>
+        </a>
+
+        <nav class="app-nav">
+            {% if user.is_admin %}
+            <div class="nav-section">Overview</div>
+            <a class="nav-link {% if url_name == 'admin_dashboard' or url_name == 'index' %}active{% endif %}" href="{% url 'dashboard:index' %}">
+                <i class="fas fa-grip"></i> Dashboard
+            </a>
+            <div class="nav-section">Manage</div>
+            <a class="nav-link {% if 'donation' in path and 'admin' in path %}active{% endif %}" href="{% url 'donations:admin_donation_list' %}">
+                <i class="fas fa-hand-holding-heart"></i> Donations
+            </a>
+            <a class="nav-link {% if '/volunteers/' in path %}active{% endif %}" href="{% url 'volunteers:volunteer_list' %}">
+                <i class="fas fa-people-carry-box"></i> Volunteers
+            </a>
+            <a class="nav-link {% if '/donors/' in path %}active{% endif %}" href="{% url 'donors:donor_list' %}">
+                <i class="fas fa-user-group"></i> Donors
+            </a>
+            <a class="nav-link {% if '/areas/' in path %}active{% endif %}" href="{% url 'areas:area_list' %}">
+                <i class="fas fa-map-location-dot"></i> Areas
+            </a>
+            <a class="nav-link {% if '/gallery/' in path %}active{% endif %}" href="{% url 'gallery:admin_gallery_list' %}">
+                <i class="fas fa-images"></i> Gallery
+            </a>
+            <div class="nav-section">System</div>
+            <a class="nav-link" href="/admin/" target="_blank" rel="noopener">
+                <i class="fas fa-screwdriver-wrench"></i> Admin Panel
+            </a>
+
+            {% elif user.is_donor %}
+            <div class="nav-section">Overview</div>
+            <a class="nav-link {% if url_name == 'donor_dashboard' or url_name == 'index' %}active{% endif %}" href="{% url 'dashboard:index' %}">
+                <i class="fas fa-grip"></i> Dashboard
+            </a>
+            <div class="nav-section">Donations</div>
+            <a class="nav-link {% if url_name == 'create_donation' %}active{% endif %}" href="{% url 'donations:create_donation' %}">
+                <i class="fas fa-circle-plus"></i> New Donation
+            </a>
+            <a class="nav-link {% if 'my-donations' in path or url_name == 'donation_detail' or '/gallery/' in path %}active{% endif %}" href="{% url 'donations:donor_donation_list' %}">
+                <i class="fas fa-list-check"></i> My Donations
+            </a>
+            <div class="nav-section">Account</div>
+            <a class="nav-link {% if url_name == 'donor_profile' %}active{% endif %}" href="{% url 'donors:donor_profile' %}">
+                <i class="fas fa-user"></i> My Profile
+            </a>
+
+            {% elif user.is_volunteer %}
+            <div class="nav-section">Overview</div>
+            <a class="nav-link {% if url_name == 'volunteer_dashboard' or url_name == 'index' %}active{% endif %}" href="{% url 'dashboard:index' %}">
+                <i class="fas fa-grip"></i> Dashboard
+            </a>
+            {% if user.volunteer_profile.status == 'ACCEPTED' %}
+            <div class="nav-section">Work</div>
+            <a class="nav-link {% if 'volunteer' in path and 'donations' in path or '/gallery/' in path %}active{% endif %}" href="{% url 'donations:volunteer_donation_list' %}">
+                <i class="fas fa-truck-ramp-box"></i> Assigned Donations
+            </a>
+            {% endif %}
+            <div class="nav-section">Account</div>
+            <a class="nav-link {% if url_name == 'volunteer_profile' %}active{% endif %}" href="{% url 'volunteers:volunteer_profile' %}">
+                <i class="fas fa-user"></i> My Profile
+            </a>
+            {% endif %}
+        </nav>
+
+        <div class="sidebar-user">
+            <span class="avatar avatar-sm">{% if user.first_name %}{{ user.first_name|first }}{{ user.last_name|first }}{% else %}{{ user.email|first }}{% endif %}</span>
+            <div class="min-w-0">
+                <div class="name">{{ user.get_full_name|default:"Account" }}</div>
+                <div class="email">{{ user.email }}</div>
+            </div>
+            <a href="{% url 'accounts:logout' %}" class="logout" title="Log out" aria-label="Log out">
+                <i class="fas fa-arrow-right-from-bracket"></i>
+            </a>
+        </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- Main -->
+    <div class="app-main">
+        <header class="app-topbar">
+            <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Open menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="min-w-0">
+                <div class="page-crumb">{{ user.get_role_display }} workspace</div>
+                <h1 class="page-title text-truncate">{% block page_title %}Dashboard{% endblock %}</h1>
+            </div>
+            <div class="topbar-actions">
+                {% block page_actions %}{% endblock %}
+                <span class="role-pill">{{ user.get_role_display }}</span>
+                <div class="dropdown">
+                    <button class="user-menu-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="avatar avatar-sm">{% if user.first_name %}{{ user.first_name|first }}{{ user.last_name|first }}{% else %}{{ user.email|first }}{% endif %}</span>
+                        <span class="user-name">{{ user.first_name|default:user.email }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li class="px-3 py-2">
+                            <div class="fw-semibold text-dark small">{{ user.get_full_name|default:"Account" }}</div>
+                            <div class="text-muted" style="font-size:.78rem">{{ user.email }}</div>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        {% if user.is_donor %}
+                        <li><a class="dropdown-item" href="{% url 'donors:donor_profile' %}"><i class="fas fa-user"></i> My profile</a></li>
+                        {% elif user.is_volunteer %}
+                        <li><a class="dropdown-item" href="{% url 'volunteers:volunteer_profile' %}"><i class="fas fa-user"></i> My profile</a></li>
+                        {% elif user.is_admin %}
+                        <li><a class="dropdown-item" href="/admin/" target="_blank" rel="noopener"><i class="fas fa-screwdriver-wrench"></i> Admin panel</a></li>
+                        {% endif %}
+                        <li><a class="dropdown-item" href="{% url 'accounts:home' %}"><i class="fas fa-house"></i> Public site</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:logout' %}"><i class="fas fa-arrow-right-from-bracket"></i> Log out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-content">
+            {% if messages %}
+            <div class="flash-stack mb-3">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="fas {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'error' or message.tags == 'danger' %}fa-circle-exclamation{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %} mt-1"></i>
+                    <div>{{ message }}</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    {% endwith %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script>
+        (function () {
+            var body = document.body;
+            document.getElementById('sidebarToggle').addEventListener('click', function () { body.classList.add('sidebar-open'); });
+            document.getElementById('sidebarBackdrop').addEventListener('click', function () { body.classList.remove('sidebar-open'); });
+            // Friendlier DataTables defaults across every list page
+            if (window.jQuery && jQuery.fn.dataTable) {
+                jQuery.extend(true, jQuery.fn.dataTable.defaults, {
+                    language: { search: '', searchPlaceholder: 'Search…', info: 'Showing _START_–_END_ of _TOTAL_', paginate: { previous: '‹', next: '›' } }
+                });
+                jQuery.fn.dataTable.Buttons.defaults.dom.button.className = 'btn btn-light btn-sm';
+            }
+        })();
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

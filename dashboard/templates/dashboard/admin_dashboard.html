@@ -1,0 +1,170 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="welcome-banner mb-4 d-flex flex-wrap align-items-center gap-3">
+    <div class="me-auto">
+        <h2>Good to see you, {{ user.first_name|default:"Admin" }} 👋</h2>
+        <p>{% if new_donations %}{{ new_donations }} new donation{{ new_donations|pluralize }} waiting for review{% if pending_volunteers %} and {{ pending_volunteers }} volunteer application{{ pending_volunteers|pluralize }} to check{% endif %}.{% else %}You're all caught up. No donations waiting for review.{% endif %}</p>
+    </div>
+    <a href="{% url 'donations:admin_donation_list' %}?status=NEW" class="btn btn-light"><i class="fas fa-inbox"></i> Review new requests</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+        <a href="{% url 'donations:admin_donation_list' %}" class="stat-card tone-teal">
+            <span class="stat-icon"><i class="fas fa-hand-holding-heart"></i></span>
+            <div><div class="stat-label">Total donations</div><div class="stat-value">{{ total_donations }}</div></div>
+        </a>
+    </div>
+    <div class="col-6 col-xl-3">
+        <a href="{% url 'donations:admin_donation_list' %}?status=NEW" class="stat-card tone-amber">
+            <span class="stat-icon"><i class="fas fa-inbox"></i></span>
+            <div><div class="stat-label">New requests</div><div class="stat-value">{{ new_donations }}</div></div>
+        </a>
+    </div>
+    <div class="col-6 col-xl-3">
+        <a href="{% url 'donations:admin_donation_list' %}?status=DELIVERED" class="stat-card tone-green">
+            <span class="stat-icon"><i class="fas fa-circle-check"></i></span>
+            <div><div class="stat-label">Delivered</div><div class="stat-value">{{ delivered_donations }}</div></div>
+        </a>
+    </div>
+    <div class="col-6 col-xl-3">
+        <a href="{% url 'donors:donor_list' %}" class="stat-card tone-rose">
+            <span class="stat-icon"><i class="fas fa-user-group"></i></span>
+            <div><div class="stat-label">Donors</div><div class="stat-value">{{ total_donors }}</div></div>
+        </a>
+    </div>
+    <div class="col-6 col-xl-3">
+        <a href="{% url 'volunteers:volunteer_list' %}" class="stat-card tone-violet">
+            <span class="stat-icon"><i class="fas fa-people-carry-box"></i></span>
+            <div><div class="stat-label">Volunteers</div><div class="stat-value">{{ total_volunteers }}</div></div>
+        </a>
+    </div>
+    <div class="col-6 col-xl-3">
+        <a href="{% url 'volunteers:volunteer_list' %}?status=PENDING" class="stat-card tone-slate">
+            <span class="stat-icon"><i class="fas fa-user-clock"></i></span>
+            <div><div class="stat-label">Pending volunteers</div><div class="stat-value">{{ pending_volunteers }}</div></div>
+        </a>
+    </div>
+    <div class="col-6 col-xl-3">
+        <a href="{% url 'areas:area_list' %}" class="stat-card tone-sky">
+            <span class="stat-icon"><i class="fas fa-map-location-dot"></i></span>
+            <div><div class="stat-label">Active areas</div><div class="stat-value">{{ total_areas }}</div></div>
+        </a>
+    </div>
+    <div class="col-6 col-xl-3">
+        <a href="{% url 'donations:admin_donation_list' %}?status=ACCEPTED" class="stat-card tone-indigo">
+            <span class="stat-icon"><i class="fas fa-truck-ramp-box"></i></span>
+            <div><div class="stat-label">Awaiting pickup</div><div class="stat-value">{{ accepted_donations }}</div></div>
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <h5 class="mb-0">Recent donations</h5>
+                <a href="{% url 'donations:admin_donation_list' %}" class="btn btn-light btn-sm ms-auto">View all <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="card-body">
+                {% if recent_donations %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr><th>Donation</th><th>Donor</th><th>Area</th><th>Status</th><th>Date</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            {% for donation in recent_donations %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="icon-chip icon-chip-sm">{% include 'includes/type_icon.html' with type=donation.donation_type %}</span>
+                                        <div>
+                                            <div class="text-dark">{{ donation.get_donation_type_display }}</div>
+                                            <div class="text-muted fw-normal small">#{{ donation.id }} · {{ donation.quantity }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ donation.donor.user.get_full_name }}</td>
+                                <td>{{ donation.area.name|default:"-" }}</td>
+                                <td>{% include 'includes/status_badge.html' with status=donation.status %}</td>
+                                <td class="text-muted text-nowrap">{{ donation.created_at|date:"M d" }}</td>
+                                <td class="text-end"><a href="{% url 'donations:admin_donation_detail' donation.id %}" class="btn btn-light btn-sm" aria-label="Open"><i class="fas fa-chevron-right"></i></a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state"><div class="empty-icon"><i class="fas fa-box-open"></i></div><h5>No donations yet</h5><p class="mb-0">New donations from donors will show up here.</p></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 d-flex flex-column gap-4">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Donation pipeline</h5></div>
+            <div class="card-body">
+                <div class="progress-thin mb-3">
+                    {% for s in breakdown %}{% if s.count %}<span style="width:{{ s.pct|stringformat:'s' }}%;background:{{ s.color }}" title="{{ s.label }}: {{ s.count }}"></span>{% endif %}{% endfor %}
+                </div>
+                {% for s in breakdown %}
+                <a href="{% url 'donations:admin_donation_list' %}?status={{ s.code }}" class="d-flex align-items-center py-1 text-reset">
+                    <span class="legend-dot" style="background:{{ s.color }}"></span>
+                    <span class="small fw-medium">{{ s.label }}</span>
+                    <span class="ms-auto small fw-bold text-dark">{{ s.count }}</span>
+                    <span class="small text-muted ms-2" style="width:3.2rem;text-align:right">{{ s.pct|floatformat:0 }}%</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <h5 class="mb-0">Volunteer applications</h5>
+                {% if pending_volunteers %}<span class="badge bg-warning ms-auto">{{ pending_volunteers }} pending</span>{% endif %}
+            </div>
+            <div class="card-body">
+                {% for volunteer in pending_volunteer_list %}
+                <div class="list-row">
+                    <span class="avatar avatar-sm">{{ volunteer.user.first_name|first }}{{ volunteer.user.last_name|first }}</span>
+                    <div class="min-w-0">
+                        <div class="title">{{ volunteer.user.get_full_name }}</div>
+                        <div class="meta text-truncate">{{ volunteer.user.email }}</div>
+                    </div>
+                    <a href="{% url 'volunteers:volunteer_detail' volunteer.id %}" class="btn btn-outline-primary btn-sm ms-auto">Review</a>
+                </div>
+                {% empty %}
+                <div class="empty-state py-3"><div class="empty-icon"><i class="fas fa-user-check"></i></div><p class="mb-0 small">No pending applications</p></div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <h5 class="mb-0">Top areas</h5>
+                <a href="{% url 'areas:area_list' %}" class="btn btn-light btn-sm ms-auto">Manage</a>
+            </div>
+            <div class="card-body">
+                {% for area in areas %}
+                <div class="list-row">
+                    <span class="icon-chip icon-chip-sm tone-sky"><i class="fas fa-location-dot"></i></span>
+                    <div class="min-w-0">
+                        <div class="title">{{ area.name }}</div>
+                        <div class="meta">{{ area.n_volunteers }} volunteer{{ area.n_volunteers|pluralize }}</div>
+                    </div>
+                    <span class="ms-auto fw-bold text-dark small">{{ area.n_donations }} <span class="text-muted fw-normal">donation{{ area.n_donations|pluralize }}</span></span>
+                </div>
+                {% empty %}
+                <p class="text-muted small mb-0">No active areas yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

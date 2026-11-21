@@ -1,0 +1,100 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Donation #{{ donation.id }}{% endblock %}
+{% block page_title %}Manage Donation #{{ donation.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Donation Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <strong>Donor:</strong> {{ donation.donor.user.get_full_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Type:</strong> {{ donation.get_donation_type_display }}
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <strong>Quantity:</strong> {{ donation.quantity }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Area:</strong> {{ donation.area.name }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <strong>Description:</strong> {{ donation.description|default:"No description" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Collection Status</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        {{ form.status }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        {{ form.notes }}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Status
+                    </button>
+                    <a href="{% url 'donations:volunteer_donation_list' %}" class="btn btn-secondary">
+                        Back
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <a href="{% url 'gallery:upload_image' donation.id %}" class="btn btn-info w-100 mb-2">
+                    <i class="fas fa-upload"></i> Upload Delivery Image
+                </a>
+                
+                {% if donation.images.exists %}
+                <a href="{% url 'gallery:donation_gallery' donation.id %}" class="btn btn-secondary w-100">
+                    <i class="fas fa-images"></i> View Images ({{ donation.images.count }})
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Collection Info</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Status:</strong> {{ collection_request.get_status_display }}</p>
+                {% if collection_request.collected_at %}
+                <p><strong>Collected:</strong> {{ collection_request.collected_at|date:"M d, Y H:i" }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

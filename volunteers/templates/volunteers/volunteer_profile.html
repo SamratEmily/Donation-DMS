@@ -1,0 +1,52 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}My Profile{% endblock %}
+{% block page_title %}Volunteer Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Profile Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Name:</strong> {{ volunteer.user.get_full_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Email:</strong> {{ volunteer.user.email }}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Status:</strong>
+                        {% if volunteer.status == 'PENDING' %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% elif volunteer.status == 'ACCEPTED' %}
+                            <span class="badge bg-success">Accepted</span>
+                        {% else %}
+                            <span class="badge bg-danger">Rejected</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Assigned Area:</strong> {{ volunteer.assigned_area.name|default:"Not assigned yet" }}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Phone:</strong> {{ volunteer.phone|default:"Not provided" }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Joined:</strong> {{ volunteer.created_at|date:"M d, Y" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

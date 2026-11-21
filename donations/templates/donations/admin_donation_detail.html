@@ -1,0 +1,93 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Donation #{{ donation.id }} - Admin{% endblock %}
+{% block page_title %}Manage Donation #{{ donation.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Update Donation</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Donor</label>
+                        <input type="text" class="form-control" value="{{ donation.donor.user.get_full_name }}" readonly>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Type</label>
+                            <input type="text" class="form-control" value="{{ donation.get_donation_type_display }}" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Quantity</label>
+                            <input type="text" class="form-control" value="{{ donation.quantity }}" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" readonly>{{ donation.description|default:"No description" }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Area</label>
+                        {{ form.area }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        {{ form.status }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Admin Remark</label>
+                        {{ form.admin_remark }}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Donation
+                    </button>
+                    <a href="{% url 'donations:admin_donation_list' %}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                {% if donation.status == 'NEW' %}
+                <a href="{% url 'donations:accept_donation' donation.id %}" class="btn btn-success w-100 mb-2">
+                    <i class="fas fa-check"></i> Accept
+                </a>
+                <a href="{% url 'donations:reject_donation' donation.id %}" class="btn btn-danger w-100">
+                    <i class="fas fa-times"></i> Reject
+                </a>
+                {% endif %}
+                
+                <a href="{% url 'gallery:upload_image' donation.id %}" class="btn btn-info w-100 mt-2">
+                    <i class="fas fa-upload"></i> Upload Image
+                </a>
+                
+                {% if donation.images.exists %}
+                <a href="{% url 'gallery:donation_gallery' donation.id %}" class="btn btn-secondary w-100 mt-2">
+                    <i class="fas fa-images"></i> View Images ({{ donation.images.count }})
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

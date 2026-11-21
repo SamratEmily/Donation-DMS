@@ -1,0 +1,57 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Upload Image{% endblock %}
+{% block page_title %}Upload Delivery Image{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card mb-3">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Donation #{{ donation.id }} - {{ donation.get_donation_type_display }}</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Donor:</strong> {{ donation.donor.user.get_full_name }}</p>
+                <p><strong>Quantity:</strong> {{ donation.quantity }}</p>
+                <p><strong>Area:</strong> {{ donation.area.name }}</p>
+            </div>
+        </div>
+        
+        <div class="card">c
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Upload Image</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Image *</label>
+                        {{ form.image }}
+                        {% if form.image.errors %}
+                        <div class="text-danger small">{{ form.image.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Caption (Optional)</label>
+                        {{ form.caption }}
+                        {% if form.caption.errors %}
+                        <div class="text-danger small">{{ form.caption.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Upload Image
+                    </button>
+                    <a href="{% url 'gallery:donation_gallery' donation.id %}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,113 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Manage Volunteers{% endblock %}
+{% block page_title %}Manage Volunteers{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">All Volunteers</h5>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <form method="get" class="row g-3">
+                <div class="col-auto">
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <a href="{% url 'volunteers:volunteer_list' %}" class="btn btn-secondary">Reset</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover" id="volunteersTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Assigned Area</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for volunteer in volunteers %}
+                    <tr>
+                        <td>{{ volunteer.id }}</td>
+                        <td>{{ volunteer.user.get_full_name }}</td>
+                        <td>{{ volunteer.user.email }}</td>
+                        <td>{{ volunteer.phone|default:"-" }}</td>
+                        <td>{{ volunteer.assigned_area.name|default:"Not assigned" }}</td>
+                        <td>
+                            {% if volunteer.status == 'PENDING' %}
+                            <span class="badge bg-warning">Pending</span>
+                            {% elif volunteer.status == 'ACCEPTED' %}
+                            <span class="badge bg-success">Accepted</span>
+                            {% else %}
+                            <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ volunteer.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <a href="{% url 'volunteers:volunteer_detail' volunteer.id %}"
+                                class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            {% if volunteer.status == 'PENDING' %}
+                            <a href="{% url 'volunteers:accept_volunteer' volunteer.id %}"
+                                class="btn btn-sm btn-success">
+                                <i class="fas fa-check"></i>
+                            </a>
+                            <a href="{% url 'volunteers:reject_volunteer' volunteer.id %}"
+                                class="btn btn-sm btn-danger">
+                                <i class="fas fa-times"></i>
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'volunteers:delete_volunteer' volunteer.id %}"
+                                class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center">No volunteers found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#volunteersTable').DataTable({
+        "order": [[0, "desc"]],
+        "pageLength": 25,
+        "language": {
+            "emptyTable": "No volunteers found"
+        },
+        "dom": 'Bfrtip',
+        "buttons": [
+            'copy', 'csv', 'excel', 'print'
+        ]
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}DMS · Making charity easier, together{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/landing.css' %}">
+{% endblock %}
+
+{% block body %}
+<!-- Nav -->
+<header class="site-nav">
+    <div class="container inner">
+        <a href="{% url 'accounts:home' %}" class="app-brand">
+            <span class="brand-mark"><i class="fas fa-heart"></i></span>
+            <span>DMS<small>Donation Management</small></span>
+        </a>
+        <nav class="links">
+            <a href="#impact">Impact</a>
+            <a href="#roles">Get involved</a>
+            <a href="#how">How it works</a>
+        </nav>
+        <div class="cta">
+            <a href="{% url 'accounts:login' %}" class="btn btn-light">Log in</a>
+            <a href="{% url 'accounts:donor_signup' %}" class="btn btn-primary d-none d-sm-inline-flex">Donate now</a>
+        </div>
+    </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="eyebrow"><span class="dot">New</span> Track every donation from pickup to delivery</span>
+                <h1 class="hero-title">Making charity <span class="grad">easier, together.</span></h1>
+                <p class="hero-sub">
+                    We connect generous donors with local volunteers, so food, clothes, books and funds
+                    reach the families who need them, with every step visible along the way.
+                </p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{% url 'accounts:donor_signup' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-heart"></i> Start donating
+                    </a>
+                    <a href="{% url 'accounts:volunteer_signup' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-hands-helping"></i> Become a volunteer
+                    </a>
+                </div>
+                <div class="hero-trust">
+                    <div class="avatars">
+                        <span class="avatar avatar-sm" style="background:linear-gradient(135deg,#5eead4,#0d8a76)">RU</span>
+                        <span class="avatar avatar-sm" style="background:linear-gradient(135deg,#fdba74,#f05d6c)">NJ</span>
+                        <span class="avatar avatar-sm" style="background:linear-gradient(135deg,#a5b4fc,#6366f1)">TA</span>
+                    </div>
+                    <span><strong class="text-dark">{{ total_volunteers|default:0 }} volunteers</strong> active across {{ total_areas|default:0 }} areas</span>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="hero-visual">
+                    <div class="journey-card">
+                        <div class="head">
+                            <span class="icon-chip tone-amber"><i class="fas fa-bowl-rice"></i></span>
+                            <div>
+                                <div class="fw-bold text-dark">100 kg rice</div>
+                                <div class="text-muted small">Monthly support · Mirpur</div>
+                            </div>
+                            <span class="badge bg-success ms-auto">Delivered</span>
+                        </div>
+                        <div class="journey-step">
+                            <span class="icon-chip tone-slate"><i class="fas fa-paper-plane"></i></span>
+                            <div><div class="t">Submitted</div><div class="d">Donor listed the items</div></div>
+                            <span class="when">Day 1</span>
+                        </div>
+                        <div class="journey-step">
+                            <span class="icon-chip tone-sky"><i class="fas fa-circle-check"></i></span>
+                            <div><div class="t">Accepted</div><div class="d">Admin assigned an area</div></div>
+                            <span class="when">Day 1</span>
+                        </div>
+                        <div class="journey-step">
+                            <span class="icon-chip tone-indigo"><i class="fas fa-truck-ramp-box"></i></span>
+                            <div><div class="t">Collected</div><div class="d">Volunteer picked it up</div></div>
+                            <span class="when">Day 2</span>
+                        </div>
+                        <div class="journey-step">
+                            <span class="icon-chip tone-green"><i class="fas fa-house-chimney-user"></i></span>
+                            <div><div class="t">Delivered</div><div class="d">20 families supported</div></div>
+                            <span class="when">Day 3</span>
+                        </div>
+                    </div>
+                    <div class="float-chip one">
+                        <span class="icon-chip icon-chip-sm tone-rose"><i class="fas fa-heart"></i></span>
+                        <div>{{ delivered_donations|default:0 }} delivered<small>and counting</small></div>
+                    </div>
+                    <div class="float-chip two">
+                        <span class="icon-chip icon-chip-sm tone-teal"><i class="fas fa-location-dot"></i></span>
+                        <div>{{ total_areas|default:0 }} areas<small>covered by volunteers</small></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats -->
+<section class="stats-strip">
+    <div class="container">
+        <div class="panel">
+            <div class="item">
+                <span class="icon-chip tone-teal"><i class="fas fa-gift"></i></span>
+                <div><div class="num">{{ total_donations|default:0 }}</div><div class="lbl">Total donations</div></div>
+            </div>
+            <div class="item">
+                <span class="icon-chip tone-green"><i class="fas fa-circle-check"></i></span>
+                <div><div class="num">{{ delivered_donations|default:0 }}</div><div class="lbl">Delivered</div></div>
+            </div>
+            <div class="item">
+                <span class="icon-chip tone-violet"><i class="fas fa-people-carry-box"></i></span>
+                <div><div class="num">{{ total_volunteers|default:0 }}</div><div class="lbl">Volunteers</div></div>
+            </div>
+            <div class="item">
+                <span class="icon-chip tone-rose"><i class="fas fa-location-dot"></i></span>
+                <div><div class="num">{{ total_areas|default:0 }}</div><div class="lbl">Areas covered</div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent deliveries -->
+<section class="section" id="impact">
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+            <div>
+                <div class="section-kicker">Real impact</div>
+                <h2 class="section-title mb-1">Recently delivered</h2>
+                <p class="text-muted mb-0">Every donation below reached a family in need.</p>
+            </div>
+            <a href="{% url 'accounts:donor_signup' %}" class="btn btn-light">Add yours <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        {% if recent_donations %}
+        <div class="row g-4">
+            {% for donation in recent_donations %}
+            <div class="col-lg-4 col-md-6">
+                <article class="impact-card">
+                    {% with img=donation.images.first %}
+                    <div class="impact-media type-{{ donation.donation_type|lower }}">
+                        {% if img %}
+                        <img src="{{ img.image.url }}" alt="{{ img.caption|default:donation.get_donation_type_display }}" loading="lazy">
+                        {% else %}
+                        {% include 'includes/type_icon.html' with type=donation.donation_type %}
+                        {% endif %}
+                        <span class="badge bg-success">Delivered</span>
+                    </div>
+                    {% endwith %}
+                    <div class="impact-body">
+                        <h5>{{ donation.get_donation_type_display }} · {{ donation.quantity }}</h5>
+                        <div class="impact-meta">
+                            {% if donation.area %}<span><i class="fas fa-location-dot"></i>{{ donation.area.name }}</span>{% endif %}
+                            <span><i class="far fa-calendar"></i>{{ donation.updated_at|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card"><div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-box-open"></i></div>
+            <h5>No deliveries yet</h5>
+            <p>Be the first to make a donation and help those in need.</p>
+            <a href="{% url 'accounts:donor_signup' %}" class="btn btn-primary mt-2"><i class="fas fa-heart"></i> Make a donation</a>
+        </div></div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Roles -->
+<section class="section section-alt" id="roles">
+    <div class="container">
+        <div class="text-center mb-5">
+            <div class="section-kicker">Get involved</div>
+            <h2 class="section-title">One platform, three ways to help</h2>
+            <p class="section-sub">Whether you give, deliver or coordinate, everyone sees the same live picture.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="role-card featured">
+                    <span class="icon-chip tone-rose"><i class="fas fa-hand-holding-heart"></i></span>
+                    <h4>Donor</h4>
+                    <p>List what you'd like to give and follow its journey all the way to delivery.</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i>Food, clothes, books, toys, medicine or funds</li>
+                        <li><i class="fas fa-check"></i>Live status for every donation</li>
+                        <li><i class="fas fa-check"></i>Delivery photos from the field</li>
+                    </ul>
+                    <a href="{% url 'accounts:donor_signup' %}" class="btn btn-primary w-100">Sign up as donor</a>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="role-card">
+                    <span class="icon-chip tone-teal"><i class="fas fa-hands-helping"></i></span>
+                    <h4>Volunteer</h4>
+                    <p>Pick up donations in your area and bring them to the people who need them.</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i>Tasks assigned to your area</li>
+                        <li><i class="fas fa-check"></i>Update pickup progress in one tap</li>
+                        <li><i class="fas fa-check"></i>Upload proof of delivery</li>
+                    </ul>
+                    <a href="{% url 'accounts:volunteer_signup' %}" class="btn btn-light w-100">Apply to volunteer</a>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="role-card">
+                    <span class="icon-chip tone-indigo"><i class="fas fa-user-shield"></i></span>
+                    <h4>Admin</h4>
+                    <p>Review requests, approve volunteers and keep every area running smoothly.</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i>Accept or reject donations</li>
+                        <li><i class="fas fa-check"></i>Manage areas and volunteers</li>
+                        <li><i class="fas fa-check"></i>Export reports in one click</li>
+                    </ul>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-light w-100">Admin log in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How it works -->
+<section class="section" id="how">
+    <div class="container">
+        <div class="text-center mb-5">
+            <div class="section-kicker">How it works</div>
+            <h2 class="section-title">From your hands to theirs in four steps</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3"><div class="step"><div class="n">1</div><h5>Sign up</h5><p>Create a free donor or volunteer account in under a minute.</p></div></div>
+            <div class="col-md-6 col-lg-3"><div class="step"><div class="n">2</div><h5>List a donation</h5><p>Tell us what you're giving and how much.</p></div></div>
+            <div class="col-md-6 col-lg-3"><div class="step"><div class="n">3</div><h5>Collection</h5><p>A volunteer from your area picks it up.</p></div></div>
+            <div class="col-md-6 col-lg-3"><div class="step"><div class="n">4</div><h5>Delivery</h5><p>It reaches a family, with a photo to prove it.</p></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="pb-5">
+    <div class="container">
+        <div class="cta-panel">
+            <h2>Ready to make a difference?</h2>
+            <p>Join our community of donors and volunteers today.</p>
+            <div class="d-flex gap-2 justify-content-center flex-wrap">
+                <a href="{% url 'accounts:donor_signup' %}" class="btn btn-primary btn-lg"><i class="fas fa-heart"></i> Donate now</a>
+                <a href="{% url 'accounts:volunteer_signup' %}" class="btn btn-ghost-light btn-lg"><i class="fas fa-hands-helping"></i> Become a volunteer</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="site-footer">
+    <div class="container d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <a href="{% url 'accounts:home' %}" class="app-brand">
+            <span class="brand-mark" style="width:32px;height:32px;font-size:.85rem"><i class="fas fa-heart"></i></span>
+            <span>DMS<small>&copy; {% now "Y" %} Donation Management System</small></span>
+        </a>
+        <div class="d-flex gap-4">
+            <a href="{% url 'accounts:login' %}">Log in</a>
+            <a href="{% url 'accounts:donor_signup' %}">Donate</a>
+            <a href="{% url 'accounts:volunteer_signup' %}">Volunteer</a>
+        </div>
+    </div>
+</footer>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Volunteer Details{% endblock %}
+{% block page_title %}Volunteer: {{ volunteer.user.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Update Volunteer Status</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" value="{{ volunteer.user.get_full_name }}" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" value="{{ volunteer.user.email }}" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text" class="form-control" value="{{ volunteer.phone|default:'Not provided' }}" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        {{ form.status }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Assigned Area</label>
+                        {{ form.assigned_area }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Joined Date</label>
+                        <input type="text" class="form-control" value="{{ volunteer.created_at|date:'M d, Y H:i' }}" readonly>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update
+                    </button>
+                    <a href="{% url 'volunteers:volunteer_list' %}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

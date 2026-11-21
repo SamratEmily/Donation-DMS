@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="auth-shell">
+    <aside class="auth-aside">
+        <a href="{% url 'accounts:home' %}" class="app-brand mb-5">
+            <span class="brand-mark"><i class="fas fa-heart"></i></span>
+            <span>DMS<small>Donation Management</small></span>
+        </a>
+        <div class="my-auto py-4">
+            <h2>{% block aside_title %}Every donation, tracked from pickup to delivery.{% endblock %}</h2>
+            <p class="lead mt-3">{% block aside_lead %}Donors, volunteers and admins working from one live picture.{% endblock %}</p>
+            <ul class="auth-points">
+                {% block aside_points %}
+                <li><span class="icon-chip icon-chip-sm"><i class="fas fa-route"></i></span>Follow each donation's journey in real time</li>
+                <li><span class="icon-chip icon-chip-sm"><i class="fas fa-location-dot"></i></span>Volunteers assigned by neighbourhood</li>
+                <li><span class="icon-chip icon-chip-sm"><i class="fas fa-camera"></i></span>Photo proof for every delivery</li>
+                {% endblock %}
+            </ul>
+        </div>
+        <div class="auth-quote">
+            <i class="fas fa-quote-left me-2" style="color:#5eead4"></i>
+            Small acts, when multiplied by millions of people, can transform the world.
+        </div>
+    </aside>
+
+    <main class="auth-main">
+        <div class="auth-card">
+            <a href="{% url 'accounts:home' %}" class="app-brand d-lg-none mb-4 p-0 text-dark">
+                <span class="brand-mark"><i class="fas fa-heart"></i></span>
+                <span>DMS</span>
+            </a>
+            {% block form %}{% endblock %}
+            <div class="mt-4 text-center">
+                <a href="{% url 'accounts:home' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to home</a>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

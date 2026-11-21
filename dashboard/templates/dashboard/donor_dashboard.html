@@ -1,0 +1,123 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}My Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'donations:create_donation' %}" class="btn btn-primary d-none d-md-inline-flex"><i class="fas fa-plus"></i> New donation</a>
+{% endblock %}
+
+{% block content %}
+<div class="welcome-banner mb-4 d-flex flex-wrap align-items-center gap-3">
+    <div class="me-auto">
+        <h2>Thank you, {{ user.first_name|default:"friend" }} 💚</h2>
+        <p>{% if delivered_donations %}{{ delivered_donations }} of your donation{{ delivered_donations|pluralize }} reached a family. Here's where the rest are.{% else %}Your donations and their progress all live here.{% endif %}</p>
+    </div>
+    <a href="{% url 'donations:create_donation' %}" class="btn btn-light"><i class="fas fa-heart text-danger"></i> Make a donation</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+        <div class="stat-card tone-teal">
+            <span class="stat-icon"><i class="fas fa-hand-holding-heart"></i></span>
+            <div><div class="stat-label">Total donations</div><div class="stat-value">{{ total_donations }}</div></div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="stat-card tone-amber">
+            <span class="stat-icon"><i class="fas fa-hourglass-half"></i></span>
+            <div><div class="stat-label">Under review</div><div class="stat-value">{{ new_donations }}</div></div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="stat-card tone-indigo">
+            <span class="stat-icon"><i class="fas fa-truck-fast"></i></span>
+            <div><div class="stat-label">In progress</div><div class="stat-value">{{ accepted_donations|add:collected_donations }}</div></div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="stat-card tone-green">
+            <span class="stat-icon"><i class="fas fa-circle-check"></i></span>
+            <div><div class="stat-label">Delivered</div><div class="stat-value">{{ delivered_donations }}</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center">
+                <h5 class="mb-0">Recent donations</h5>
+                <a href="{% url 'donations:donor_donation_list' %}" class="btn btn-light btn-sm ms-auto">View all <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="card-body">
+                {% if recent_donations %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr><th>Donation</th><th>Area</th><th>Status</th><th>Date</th><th></th></tr></thead>
+                        <tbody>
+                            {% for donation in recent_donations %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="icon-chip icon-chip-sm">{% include 'includes/type_icon.html' with type=donation.donation_type %}</span>
+                                        <div>
+                                            <div class="text-dark">{{ donation.get_donation_type_display }}</div>
+                                            <div class="text-muted fw-normal small">{{ donation.quantity }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ donation.area.name|default:"-" }}</td>
+                                <td>{% include 'includes/status_badge.html' with status=donation.status %}</td>
+                                <td class="text-muted text-nowrap">{{ donation.created_at|date:"M d" }}</td>
+                                <td class="text-end"><a href="{% url 'donations:donation_detail' donation.id %}" class="btn btn-light btn-sm">Track <i class="fas fa-chevron-right"></i></a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                    <h5>No donations yet</h5>
+                    <p>Start by creating your first donation.</p>
+                    <a href="{% url 'donations:create_donation' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Create donation</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 d-flex flex-column gap-4">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Where your donations are</h5></div>
+            <div class="card-body">
+                {% if total_donations %}
+                <div class="progress-thin mb-3">
+                    {% for s in breakdown %}{% if s.count %}<span style="width:{{ s.pct|stringformat:'s' }}%;background:{{ s.color }}" title="{{ s.label }}: {{ s.count }}"></span>{% endif %}{% endfor %}
+                </div>
+                {% for s in breakdown %}
+                <div class="d-flex align-items-center py-1">
+                    <span class="legend-dot" style="background:{{ s.color }}"></span>
+                    <span class="small fw-medium">{{ s.label }}</span>
+                    <span class="ms-auto small fw-bold text-dark">{{ s.count }}</span>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted small mb-0">Your donation progress will appear here.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">How it works</h5></div>
+            <div class="card-body">
+                <div class="list-row"><span class="icon-chip icon-chip-sm tone-amber"><i class="fas fa-paper-plane"></i></span><div><div class="title">You submit</div><div class="meta">Tell us what you're giving</div></div></div>
+                <div class="list-row"><span class="icon-chip icon-chip-sm tone-sky"><i class="fas fa-circle-check"></i></span><div><div class="title">Admin accepts</div><div class="meta">and assigns it to an area</div></div></div>
+                <div class="list-row"><span class="icon-chip icon-chip-sm tone-indigo"><i class="fas fa-truck-ramp-box"></i></span><div><div class="title">Volunteer collects</div><div class="meta">from your address</div></div></div>
+                <div class="list-row"><span class="icon-chip icon-chip-sm tone-green"><i class="fas fa-camera"></i></span><div><div class="title">Delivered</div><div class="meta">with a photo for you to see</div></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'accounts/auth_base.html' %}
+{% load static %}
+
+{% block title %}Become a volunteer · DMS{% endblock %}
+
+{% block aside_title %}Be the hands that carry kindness home.{% endblock %}
+{% block aside_lead %}Collect donations in your neighbourhood and deliver them to families who need them.{% endblock %}
+{% block aside_points %}
+<li><span class="icon-chip icon-chip-sm"><i class="fas fa-location-dot"></i></span>Tasks only from your assigned area</li>
+<li><span class="icon-chip icon-chip-sm"><i class="fas fa-list-check"></i></span>Update pickup progress in one tap</li>
+<li><span class="icon-chip icon-chip-sm"><i class="fas fa-camera"></i></span>Share a photo when you deliver</li>
+{% endblock %}
+
+{% block form %}
+<span class="badge bg-success mb-3"><i class="fas fa-hands-helping"></i> Volunteer application</span>
+<h1>Join as a volunteer</h1>
+<p class="sub">Tell us a little about yourself to get started.</p>
+
+<div class="alert alert-info">
+    <i class="fas fa-circle-info mt-1"></i>
+    <div>An admin reviews every application. You'll get access to tasks once you're approved.</div>
+</div>
+
+<form method="post" id="volunteerSignupForm" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger"><i class="fas fa-circle-exclamation mt-1"></i><div>{{ form.non_field_errors }}</div></div>
+    {% endif %}
+
+    <div class="row g-3 mb-3">
+        <div class="col-sm-6">
+            <label for="{{ form.first_name.id_for_label }}" class="form-label">First name</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors }}</div>{% endif %}
+        </div>
+        <div class="col-sm-6">
+            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last name</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors }}</div>{% endif %}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="{{ form.email.id_for_label }}" class="form-label">Email address</label>
+        <div class="input-icon"><i class="far fa-envelope"></i>{{ form.email }}</div>
+        {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors }}</div>{% endif %}
+    </div>
+
+    <div class="mb-3">
+        <label for="{{ form.password1.id_for_label }}" class="form-label">Password</label>
+        <div class="input-icon"><i class="fas fa-lock"></i>{{ form.password1 }}</div>
+        {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors }}</div>{% endif %}
+        <div class="form-text">At least 8 characters.</div>
+    </div>
+
+    <div class="mb-4">
+        <label for="{{ form.password2.id_for_label }}" class="form-label">Confirm password</label>
+        <div class="input-icon"><i class="fas fa-lock"></i>{{ form.password2 }}</div>
+        {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors }}</div>{% endif %}
+        <div id="passwordMatchMessage" class="form-text"></div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg w-100">
+        Submit application <i class="fas fa-arrow-right"></i>
+    </button>
+</form>
+
+<p class="text-center text-muted mt-4 mb-0">
+    Already have an account? <a href="{% url 'accounts:login' %}" class="fw-semibold">Log in</a>
+</p>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/form_validations.js' %}"></script>
+{% endblock %}

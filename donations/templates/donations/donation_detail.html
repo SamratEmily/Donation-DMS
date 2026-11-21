@@ -1,0 +1,114 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Donation #{{ donation.id }}{% endblock %}
+{% block page_title %}Donation Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Donation #{{ donation.id }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Type:</strong> {{ donation.get_donation_type_display }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Quantity:</strong> {{ donation.quantity }}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Status:</strong>
+                        {% if donation.status == 'NEW' %}
+                            <span class="badge bg-warning">New</span>
+                        {% elif donation.status == 'ACCEPTED' %}
+                            <span class="badge bg-info">Accepted</span>
+                        {% elif donation.status == 'COLLECTED' %}
+                            <span class="badge bg-primary">Collected</span>
+                        {% elif donation.status == 'DELIVERED' %}
+                            <span class="badge bg-success">Delivered</span>
+                        {% else %}
+                            <span class="badge bg-danger">Rejected</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Area:</strong> {{ donation.area.name|default:"Not assigned yet" }}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <strong>Description:</strong>
+                        <p>{{ donation.description|default:"No description provided" }}</p>
+                    </div>
+                </div>
+                
+                {% if donation.admin_remark %}
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <strong>Admin Remark:</strong><br>
+                            {{ donation.admin_remark }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Created:</strong> {{ donation.created_at|date:"M d, Y H:i" }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Last Updated:</strong> {{ donation.updated_at|date:"M d, Y H:i" }}
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-white">
+                <a href="{% url 'donations:donor_donation_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+                {% if donation.images.exists %}
+                <a href="{% url 'gallery:donation_gallery' donation.id %}" class="btn btn-info">
+                    <i class="fas fa-images"></i> View Images
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Donation Timeline</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span>Submitted</span>
+                    </div>
+                    <div class="timeline-item {% if donation.status == 'ACCEPTED' or donation.status == 'COLLECTED' or donation.status == 'DELIVERED' %}active{% endif %}">
+                        <i class="fas fa-check-circle {% if donation.status == 'ACCEPTED' or donation.status == 'COLLECTED' or donation.status == 'DELIVERED' %}text-success{% else %}text-muted{% endif %}"></i>
+                        <span>Accepted</span>
+                    </div>
+                    <div class="timeline-item {% if donation.status == 'COLLECTED' or donation.status == 'DELIVERED' %}active{% endif %}">
+                        <i class="fas fa-check-circle {% if donation.status == 'COLLECTED' or donation.status == 'DELIVERED' %}text-success{% else %}text-muted{% endif %}"></i>
+                        <span>Collected</span>
+                    </div>
+                    <div class="timeline-item {% if donation.status == 'DELIVERED' %}active{% endif %}">
+                        <i class="fas fa-check-circle {% if donation.status == 'DELIVERED' %}text-success{% else %}text-muted{% endif %}"></i>
+                        <span>Delivered</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

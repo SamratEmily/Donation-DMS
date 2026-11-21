@@ -1,0 +1,82 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Donation Areas{% endblock %}
+{% block page_title %}Manage Donation Areas{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">All Areas</h5>
+        <a href="{% url 'areas:area_create' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Add Area
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="areasTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Volunteers</th>
+                        <th>Donations</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for area in areas %}
+                    <tr>
+                        <td>{{ area.id }}</td>
+                        <td>{{ area.name }}</td>
+                        <td>{{ area.get_volunteer_count }}</td>
+                        <td>{{ area.get_donation_count }}</td>
+                        <td>
+                            {% if area.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ area.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <a href="{% url 'areas:area_edit' area.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'areas:area_delete' area.id %}" class="btn btn-sm btn-outline-danger"
+                                onclick="return confirm('Are you sure?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">No areas found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#areasTable').DataTable({
+        "order": [[0, "desc"]],
+        "pageLength": 25,
+        "language": {
+            "emptyTable": "No areas found"
+        },
+        "dom": 'Bfrtip',
+        "buttons": [
+            'copy', 'csv', 'excel', 'print'
+        ]
+    });
+});
+</script>
+{% endblock %}

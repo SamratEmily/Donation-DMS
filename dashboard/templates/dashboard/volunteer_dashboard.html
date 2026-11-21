@@ -1,0 +1,141 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Volunteer Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+{% if status == 'pending' %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card status-hero">
+            <span class="icon-chip tone-amber"><i class="fas fa-hourglass-half"></i></span>
+            <h3>Your application is under review</h3>
+            <p class="text-muted mx-auto" style="max-width:28rem">Thanks for signing up to volunteer! An admin will review your application soon. Once you're approved, your pickup tasks will appear here.</p>
+            <div class="d-flex justify-content-center gap-2 mt-2">
+                <span class="badge bg-warning">Pending approval</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif status == 'rejected' %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card status-hero">
+            <span class="icon-chip tone-rose"><i class="fas fa-circle-xmark"></i></span>
+            <h3>Application not approved</h3>
+            <p class="text-muted mx-auto" style="max-width:28rem">Unfortunately, your volunteer application was not approved this time. Thank you for wanting to help, and you're always welcome to donate.</p>
+            <div><a href="{% url 'accounts:home' %}" class="btn btn-light mt-2"><i class="fas fa-house"></i> Back to home</a></div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="welcome-banner mb-4 d-flex flex-wrap align-items-center gap-3">
+    <div class="me-auto">
+        <h2>Hi {{ user.first_name|default:"there" }}, ready to help? 🚚</h2>
+        <p>
+            {% if volunteer.assigned_area %}
+            <i class="fas fa-location-dot me-1"></i> Your area: <strong>{{ volunteer.assigned_area.name }}</strong>
+            · {{ assigned_donations_count }} donation{{ assigned_donations_count|pluralize }} waiting for pickup
+            {% else %}
+            You haven't been assigned to an area yet. An admin will assign you soon.
+            {% endif %}
+        </p>
+    </div>
+    {% if volunteer.assigned_area %}
+    <a href="{% url 'donations:volunteer_donation_list' %}" class="btn btn-light"><i class="fas fa-list-check"></i> Open my tasks</a>
+    {% endif %}
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+        <div class="stat-card tone-teal">
+            <span class="stat-icon"><i class="fas fa-box-open"></i></span>
+            <div><div class="stat-label">Ready for pickup</div><div class="stat-value">{{ assigned_donations_count }}</div></div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="stat-card tone-amber">
+            <span class="stat-icon"><i class="fas fa-clock"></i></span>
+            <div><div class="stat-label">Pending</div><div class="stat-value">{{ pending_collections }}</div></div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="stat-card tone-indigo">
+            <span class="stat-icon"><i class="fas fa-person-walking-luggage"></i></span>
+            <div><div class="stat-label">In progress</div><div class="stat-value">{{ in_progress_collections }}</div></div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="stat-card tone-green">
+            <span class="stat-icon"><i class="fas fa-circle-check"></i></span>
+            <div><div class="stat-label">Completed</div><div class="stat-value">{{ completed_collections }}</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center">
+                <h5 class="mb-0">Waiting for pickup</h5>
+                <a href="{% url 'donations:volunteer_donation_list' %}" class="btn btn-light btn-sm ms-auto">View all <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="card-body">
+                {% if recent_donations %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr><th>Donation</th><th>Donor</th><th>Date</th><th></th></tr></thead>
+                        <tbody>
+                            {% for donation in recent_donations %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="icon-chip icon-chip-sm">{% include 'includes/type_icon.html' with type=donation.donation_type %}</span>
+                                        <div>
+                                            <div class="text-dark">{{ donation.get_donation_type_display }}</div>
+                                            <div class="text-muted fw-normal small">{{ donation.quantity }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ donation.donor.user.get_full_name }}</td>
+                                <td class="text-muted text-nowrap">{{ donation.created_at|date:"M d" }}</td>
+                                <td class="text-end"><a href="{% url 'donations:volunteer_donation_detail' donation.id %}" class="btn btn-outline-primary btn-sm">Open</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fas fa-mug-hot"></i></div>
+                    <h5>Nothing to pick up right now</h5>
+                    <p class="mb-0">New donations accepted in your area will appear here.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4">
+        <div class="card h-100">
+            <div class="card-header"><h5 class="mb-0">My recent activity</h5></div>
+            <div class="card-body">
+                {% for c in recent_collections %}
+                <div class="list-row">
+                    <span class="icon-chip icon-chip-sm {% if c.status == 'COMPLETED' %}tone-green{% elif c.status == 'IN_PROGRESS' %}tone-indigo{% else %}tone-amber{% endif %}">{% include 'includes/type_icon.html' with type=c.donation.donation_type %}</span>
+                    <div class="min-w-0">
+                        <div class="title text-truncate">{{ c.donation.get_donation_type_display }} · {{ c.donation.quantity }}</div>
+                        <div class="meta">{{ c.get_status_display }} · {{ c.updated_at|timesince }} ago</div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state py-3"><div class="empty-icon"><i class="fas fa-route"></i></div><p class="mb-0 small">Your pickups will show up here.</p></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
